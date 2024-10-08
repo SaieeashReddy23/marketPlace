@@ -1,11 +1,16 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
-const Button = ({ label, onPress, color }) => {
+const Button = ({ label, onPress, color, loading }) => {
   return (
-    <View style={styles.buttonContainer}>
+    <View style={[styles.buttonContainer]}>
       <Pressable
-        style={[styles.button, color && { backgroundColor: color }]}
+        style={[
+          styles.button,
+          color && { backgroundColor: color },
+          loading && styles.disabledButton,
+        ]}
         onPress={onPress}
+        disabled={loading}
       >
         <Text style={styles.buttonLabel}>{label}</Text>
       </Pressable>
@@ -39,5 +44,8 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     paddingRight: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#A5A5A5',
   },
 })

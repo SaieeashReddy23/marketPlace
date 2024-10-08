@@ -1,5 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import axios from 'axios'
+import {
+  dummyLoginInfo,
+  logoutUrl,
+  sendOtpUrl,
+  verifyOtpUrl,
+} from '../../utils/constants'
 
 const dummUserInfo = {
   userName: 'Ganesh',
@@ -54,30 +61,70 @@ const initialState = {
   userInfo: null,
   loading: false,
   error: null,
-  token: null,
+  isOtpSent: false,
+  sessionToken: null,
+  refreshToken: null,
+  accessToken: null,
+  mobileNumber: '',
 }
 
-export const login = createAsyncThunk(
-  'auth/login',
-  async (userCredentials, { rejectWithValue }) => {
+export const sendOtp = createAsyncThunk(
+  'auth/sendOtp',
+  async (mobileNumber, { rejectWithValue }) => {
     try {
-      const { mobileNumber, otp } = userCredentials
-      // Simulating an API call (replace with your real API)
-      // const response = await fetch('https://example.com/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ username, password }),
-      // })
-
-      // if (!response.ok) {
-      //   throw new Error('Login failed!')
-      // }
-
-      // const data = await response.json()
-      return ' retutn token and user details' // This would normally include a token or user info
+      console.log(mobileNumber)
+      const response = await axios.post(`${sendOtpUrl}/+91${mobileNumber}`)
+      return {
+        sessionToken: response.data?.data,
+        mobileNumber: mobileNumber,
+      }
     } catch (error) {
+      console.log(error)
+      if (error?.response?.data?.errors.length > 0) {
+        return rejectWithValue(error?.response?.data?.errors[0])
+      }
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+export const verifyOtp = createAsyncThunk(
+  'auth/verifyOtp',
+  async (otp, { getState, rejectWithValue }) => {
+    try {
+      const { mobileNumber, sessionToken } = getState().auth
+      const reqBody = {
+        username: `+91${mobileNumber}`,
+        session: sessionToken,
+        confirmationCode: otp,
+      }
+
+      console.log(reqBody)
+      const response = await axios.post(`${verifyOtpUrl}`, {
+        ...reqBody,
+      })
+
+      return response.data
+    } catch (error) {
+      if (error?.response?.data?.errors.length > 0) {
+        return rejectWithValue(error?.response?.data?.errors[0])
+      }
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const { mobileNumber, sessionToken } = getState().auth
+      const response = await axios(`${logoutUrl}/+91${mobileNumber}`)
+    } catch (error) {
+      console.log(error)
+      if (error?.response?.data?.errors.length > 0) {
+        return rejectWithValue(error?.response?.data?.errors[0])
+      }
       return rejectWithValue(error.message)
     }
   }
@@ -87,50 +134,104 @@ export const login = createAsyncThunk(
 export const initializeAuth = createAsyncThunk(
   'auth/initializeAuth',
   async () => {
-    const token = await AsyncStorage.getItem('authToken')
+    const accessToken = await AsyncStorage.getItem('accessToken')
     let userInfo = await AsyncStorage.getItem('userInfo')
+    let refreshToken = await AsyncStorage.getItem('refreshToken')
     if (userInfo) {
       userInfo = JSON.parse(userInfo)
     }
 
-    return { userInfo, token }
+    return { userInfo, accessToken, refreshToken }
   }
 )
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState,
+  initialState: { ...initialState },
   reducers: {
-    logout: (state) => {
-      state.userInfo = null
-      state.isLoggedIn = false
-      state.token = null
-      AsyncStorage.removeItem('authToken')
-      AsyncStorage.removeItem('userInfo')
-    },
+    // logout: (state) => {
+    //   state.userInfo = null
+    //   state.isLoggedIn = false
+    //   state.token = null
+    //   AsyncStorage.removeItem('authToken')
+    //   AsyncStorage.removeItem('userInfo')
+    // },
     loadAuthData: (state, action) => {
       const { userInfo, token } = action.payload
       state.userInfo = userInfo
       state.token = token
       state.isLoggedIn = true
     },
+    setMobileNumber: (state, action) => {
+      state.mobileNumber = action.payload
+    },
+    setError: (state, action) => {
+      state.error = action.payload
+    },
+    setDemoUser: (state) => {
+      const { accessToken, refreshToken, idToken, user, userVerified } =
+        dummyLoginInfo
+      state.isLoggedIn = true
+      state.userInfo = user
+      state.loading = false
+      state.error = null
+      state.accessToken = accessToken
+      AsyncStorage.setItem('accessToken', accessToken)
+      AsyncStorage.setItem('userInfo', JSON.stringify(user))
+      AsyncStorage.setItem('refreshToken', refreshToken)
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.pending, (state) => {
+      .addCase(sendOtp.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(login.fulfilled, (state, action) => {
-        state.isLoggedIn = true
-        state.userInfo = dummUserInfo
+      .addCase(sendOtp.fulfilled, (state, action) => {
+        const { sessionToken, mobileNumber } = action.payload
         state.loading = false
         state.error = null
-        state.token = '93y4529834203948230'
-        AsyncStorage.setItem('authToken', '93y4529834203948230')
-        AsyncStorage.setItem('userInfo', JSON.stringify(dummUserInfo))
+        state.sessionToken = sessionToken
+        state.isOtpSent = true
+        state.mobileNumber = mobileNumber
       })
-      .addCase(login.rejected, (state, action) => {
+      .addCase(sendOtp.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+        state.isOtpSent = false
+        state.mobileNumber = ''
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        const { accessToken, refreshToken, idToken, user, userVerified } =
+          action.payload
+        state.isLoggedIn = true
+        state.userInfo = user
+        state.loading = false
+        state.error = null
+        state.accessToken = accessToken
+        AsyncStorage.setItem('accessToken', accessToken)
+        AsyncStorage.setItem('userInfo', JSON.stringify(user))
+        AsyncStorage.setItem('refreshToken', refreshToken)
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      .addCase(logout.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(logout.fulfilled, (state) => {
+        AsyncStorage.removeItem('accessToken')
+        AsyncStorage.removeItem('refreshToken')
+        AsyncStorage.removeItem('userInfo')
+        return initialState
+      })
+      .addCase(logout.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })
@@ -138,16 +239,18 @@ const authSlice = createSlice({
         state.loading = true
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
-        const { token, userInfo } = action.payload
+        const { userInfo, accessToken, refreshToken } = action.payload
         state.isLoggedIn = true
         state.userInfo = userInfo
+        state.accessToken = accessToken
+        state.refreshToken = refreshToken
         state.loading = false
         state.error = null
-        state.token = token
       })
   },
 })
 
-export const { logout, loadAuthData } = authSlice.actions
+export const { loadAuthData, setError, setMobileNumber, setDemoUser } =
+  authSlice.actions
 
 export default authSlice.reducer

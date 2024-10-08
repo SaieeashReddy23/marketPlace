@@ -16,7 +16,23 @@ const ProtectedRoutesLayout = () => {
 
   return (
     <ProtectedRoute>
-      <Tabs>
+      {/* <SafeAreaView style={{ flex: 1 }}> */}
+      <Tabs
+        screenOptions={{
+          tabBarStyle: {
+            height: 70, // Increase the height
+            paddingBottom: 10, // Add padding to ensure it's not cut off
+            paddingTop: 5,
+          },
+          headerStyle: {
+            // height: 80,
+          },
+          headerStatusBarHeight: 10,
+          // tabBarItemStyle: {
+          //   marginHorizontal: 0, // Adds space between tab buttons
+          // },
+        }}
+      >
         <Tabs.Screen
           name='home'
           options={{
@@ -94,6 +110,7 @@ const ProtectedRoutesLayout = () => {
           }}
         />
       </Tabs>
+      {/* </SafeAreaView> */}
     </ProtectedRoute>
   )
 }

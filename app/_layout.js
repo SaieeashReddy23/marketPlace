@@ -21,14 +21,16 @@ const RootNavigator = () => {
 
   return (
     <Provider store={store}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name='index' />
-        <Stack.Screen name='(protected)' />
-      </Stack>
+      <SafeAreaView style={styles.container}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name='index' />
+          <Stack.Screen name='(protected)' />
+        </Stack>
+      </SafeAreaView>
     </Provider>
   )
 }

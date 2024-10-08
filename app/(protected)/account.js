@@ -8,10 +8,13 @@ import { useEffect } from 'react'
 
 const account = () => {
   const dispatch = useDispatch()
-  const { userInfo, isLoggedIn } = useSelector((store) => store.auth) || {}
+  const { userInfo, isLoggedIn, loading } =
+    useSelector((store) => store.auth) || {}
 
   const { userName, userMailId, userMobileNumber, assignedProjects } =
     userInfo || {}
+
+  const { fullName, email, phoneNumber, department } = userInfo || {}
 
   const handleSignOut = () => {
     dispatch(logout())
@@ -25,18 +28,18 @@ const account = () => {
   // }, [isLoggedIn])
 
   const renderProjectItem = ({ item }) => {
-    const { projectName, projectCode } = item
+    const { id, description } = item
     return (
       <View style={styles.projectContainer}>
         <View style={styles.projectInfoContainer}>
           <Text style={styles.projectInfoHeader}>Project Code </Text>
           <Text> : </Text>
-          <Text style={styles.projectInfoValue}>{projectCode}</Text>
+          <Text style={styles.projectInfoValue}>{description}</Text>
         </View>
         <View style={styles.projectInfoContainer}>
           <Text style={styles.projectInfoHeader}>Project Name </Text>
           <Text> : </Text>
-          <Text style={styles.projectInfoValue}>{projectName}</Text>
+          <Text style={styles.projectInfoValue}>{description}</Text>
         </View>
       </View>
     )
@@ -45,17 +48,17 @@ const account = () => {
     <View style={styles.container}>
       <View style={styles.infoContainer}>
         <Text style={styles.infoHeader}>Account Holder Name</Text>
-        <Text style={styles.infoValue}>{userName}</Text>
+        <Text style={styles.infoValue}>{fullName}</Text>
       </View>
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoHeader}>Mail Id </Text>
-        <Text style={styles.infoValue}>{userMailId}</Text>
+        <Text style={styles.infoValue}>{email}</Text>
       </View>
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoHeader}>Mobile Number</Text>
-        <Text style={styles.infoValue}>{userMobileNumber}</Text>
+        <Text style={styles.infoValue}>{phoneNumber}</Text>
       </View>
 
       <View style={styles.projectsOuterContainer}>
@@ -63,7 +66,7 @@ const account = () => {
         <View style={styles.projectsContainer}>
           <FlatList
             scrollEnabled={true}
-            data={assignedProjects}
+            data={department?.projects}
             renderItem={renderProjectItem}
             keyExtractor={(item) => item.id}
           />
@@ -71,7 +74,12 @@ const account = () => {
       </View>
 
       <View>
-        <Button label='Sign out' onPress={handleSignOut} color='#D9534F' />
+        <Button
+          label='Sign out'
+          onPress={handleSignOut}
+          color='#D9534F'
+          loading={loading}
+        />
       </View>
     </View>
   )

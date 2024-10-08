@@ -7,7 +7,7 @@ import { Link } from 'expo-router'
 const placeHolderImage = require('../assets/marketplaceLogin.png')
 const login = () => {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Ionicons
           name='storefront-outline'
@@ -31,7 +31,7 @@ const login = () => {
         </Text>
         <Text style={styles.sponser}>Powered by P360</Text>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 export default login
@@ -39,6 +39,7 @@ export default login
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   headerContainer: {
     flexDirection: 'row',
