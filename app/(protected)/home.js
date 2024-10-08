@@ -177,7 +177,7 @@ const buttons = [
 const home = () => {
   const [selectedType, setSelectedType] = useState('Requested')
   const [filteredItems, setFilteredItems] = useState([...items])
-  const firstRingSize = screenWidth * 0.4 // 50% of screen width
+  const firstRingSize = screenWidth * 0.3 // 50% of screen width
   const secondRingSize = firstRingSize * 0.89 // 90% of the first ring size
   const thirdRingSize = secondRingSize * 0.85 // 75% of the second ring size
   const fourthRingSize = thirdRingSize * 0.85 // 50% of the third ring size
@@ -311,6 +311,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 20,
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
   chartContainer: {
@@ -337,7 +338,9 @@ const styles = StyleSheet.create({
     borderRadius: 5, // Makes the dot circular
     backgroundColor: '#FF6347', // Color of the dot (Tomato red, you can change it)
   },
-  buttonLabel: {},
+  buttonLabel: {
+    fontSize: 10,
+  },
   boldText: {
     fontWeight: 'semibold',
     letterSpacing: 1,

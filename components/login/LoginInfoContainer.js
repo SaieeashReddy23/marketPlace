@@ -44,7 +44,10 @@ const LoginInfoContainer = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      router.replace('/home')
+      setTimeout(() => {
+        // Navigate once the Root Layout is mounted
+        router.push('/home')
+      }, 0)
     }
   }, [isLoggedIn])
 
