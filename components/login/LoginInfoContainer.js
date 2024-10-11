@@ -44,6 +44,7 @@ const LoginInfoContainer = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
+      console.log('Is logged in')
       setTimeout(() => {
         // Navigate once the Root Layout is mounted
         router.push('/home')
@@ -62,6 +63,7 @@ const LoginInfoContainer = () => {
           maxLength={10}
           value={mobileNumber}
           onChangeText={(text) => dispatch(setMobileNumber(text))}
+          editable={!isOtpSent}
         />
       </View>
 

@@ -1,12 +1,17 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 
-const CartButton = ({ label, onPress, color, icon, labelColor }) => {
+const CartButton = ({ label, onPress, color, icon, labelColor, loading }) => {
   return (
     <View style={styles.buttonContainer}>
       <Pressable
-        style={[styles.button, color && { backgroundColor: color }]}
+        style={[
+          styles.button,
+          color && { backgroundColor: color },
+          loading && styles.disabledButton,
+        ]}
         onPress={onPress}
+        disabled={loading}
       >
         <MaterialIcons name={icon} size={16} color={labelColor} />
         <Text style={[styles.buttonLabel, labelColor && { color: labelColor }]}>
@@ -43,5 +48,8 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     paddingRight: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#A5A5A5',
   },
 })

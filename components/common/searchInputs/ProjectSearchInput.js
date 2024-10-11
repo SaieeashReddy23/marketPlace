@@ -1,38 +1,48 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
-import IconButton from './IconButton'
-import SlideModal from './SlideModal'
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-import { TextColor } from '../../utils/constants'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
+import { TextColor } from '../../../utils/constants'
+import IconButton from '../IconButton'
+import SlideModal from '../SlideModal'
 
-const dummyreqData = {
-  data: 'data',
-  isApiCallNeeded: false,
-  url: '123',
-  requestType: 'get',
-  reqBody: 'some body',
-}
-
-const SearchInput = ({ label, value, handleChange, placeholder, id }) => {
+const ProjectSearchInput = ({ label, value, handleChange, placeholder }) => {
   const { department } = useSelector((store) => store.auth.userInfo)
   const [isVisible, setIsVisible] = useState(false)
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(value)
   const [filteredData, setFilteredData] = useState([])
-  const [data, setData] = useState([])
-  const [isLoading, setIsLoding] = useState(false)
-  const [isError, setIsError] = useState(false)
+
+  const handleOpenModal = () => {
+    console.log('open modla btn pressed')
+    setIsVisible(true)
+  }
 
   const handleSearch = async (text) => {
     setQuery(text)
   }
 
-  const handleSelectItem = (item) => {
-    handleChange(item.itemData)
-    setIsVisible(false)
+  const handleClearQuery = () => {
     setQuery('')
-    setFilteredData([])
+  }
+
+  const handleSelectItem = (item) => {
+    handleChange((prev) => {
+      return {
+        ...prev,
+        ['projectId']: item.itemId,
+        ['projectDesc']: item.itemData,
+      }
+    })
+    setIsVisible(false)
+    setQuery(item.itemData)
   }
 
   const renderItem = ({ item }) => {
@@ -47,31 +57,48 @@ const SearchInput = ({ label, value, handleChange, placeholder, id }) => {
     )
   }
 
-  // useEffect(() => {
-  //   let dat = Array.from({ length: 20 }, (_, index) => {
-  //     return `${label} -  ${index}`
-  //   }).filter(({ itemData }) =>
-  //     itemData.toLowerCase().includes(query.toLowerCase())
-  //   )
+  useEffect(() => {
+    if (query) {
+      const parsedData = department?.projects
+        .map(({ id, description }) => {
+          return {
+            itemId: id,
+            itemData: description,
+          }
+        })
+        .filter(({ itemData }) =>
+          itemData.toLowerCase().includes(query.toLowerCase())
+        )
 
-  //   setData(dat)
-
-  // }, [query])
+      setFilteredData(parsedData)
+    } else {
+      const parsedData = department?.projects.map(({ id, description }) => {
+        return {
+          itemId: id,
+          itemData: description,
+        }
+      })
+      setFilteredData(parsedData)
+    }
+  }, [query])
 
   return (
     <View>
       <View style={styles.inputFormContainer}>
         <Text style={styles.inputFormHeader}>{label}</Text>
-        <View style={styles.inputFormValueContainer}>
-          <TextInput
-            placeholder={placeholder}
-            style={styles.inputText}
-            value={value}
-            onChangeText={handleChange}
-            editable={false}
-          />
-          <IconButton icon='search' onPress={() => setIsVisible(true)} />
-        </View>
+        <Pressable onPress={handleOpenModal}>
+          <View pointerEvents='none'>
+            {/* Disables TextInput click and lets Pressable handle it */}
+            <View style={styles.inputFormValueContainer}>
+              <TextInput
+                placeholder={placeholder}
+                style={styles.inputText}
+                value={value}
+                editable={false}
+              />
+            </View>
+          </View>
+        </Pressable>
       </View>
       <SlideModal
         isVisible={isVisible}
@@ -89,6 +116,9 @@ const SearchInput = ({ label, value, handleChange, placeholder, id }) => {
             onChangeText={handleSearch}
             style={styles.inputText}
           />
+          {query !== '' && (
+            <IconButton icon='close' size={15} onPress={handleClearQuery} />
+          )}
         </View>
         <View style={styles.searchResultsContainer}>
           <FlatList
@@ -101,7 +131,7 @@ const SearchInput = ({ label, value, handleChange, placeholder, id }) => {
     </View>
   )
 }
-export default SearchInput
+export default ProjectSearchInput
 
 const styles = StyleSheet.create({
   container: {},
@@ -125,11 +155,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 10,
   },
 
   inputText: {
     color: TextColor,
+    width: '85%',
   },
 
   modalHeader: {

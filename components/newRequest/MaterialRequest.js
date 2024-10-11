@@ -10,29 +10,46 @@ import {
   View,
 } from 'react-native'
 import IconButton from '../common/IconButton'
-import { TextColor } from '../../utils/constants'
+import { PlaceRequestUrl, TextColor } from '../../utils/constants'
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../features/cart/cartSlice'
 import { useFocusEffect } from 'expo-router'
 import DatePickerComponent from '../common/DatePickerComponent'
 import CartButton from '../cart/CartButton'
 import SearchInput from '../common/SearchInput'
+import ProjectSearchInput from '../common/searchInputs/ProjectSearchInput'
+import WarehouseSearchInput from '../common/searchInputs/WarehouseSearchInput'
+import ProjectActivitySearchInput from '../common/searchInputs/ProjectActivitySearchInput'
+import RequiredMaterialSearchInput from '../common/searchInputs/RequiredMaterialSearchInput'
+import axios from 'axios'
 
 const initialState = {
-  projectCode: '',
-  warehouse: '',
-  deliveryLocation: '',
-  projectActivity: '',
-  requiredMaterial: '',
-  requiredQuantity: 0,
-  plannedDate: '',
+  projectId: '',
+  projectDesc: '',
+  warehouseId: '',
+  warehouseDesc: '',
+  activityId: '',
+  activityDesc: '',
+  itemId: '',
+  itemDesc: '',
+  itemGroupId: '',
+  itemGroupDesc: '',
+  assetId: 'ASSET123',
+  assetDesc: 'Cement Mixer',
+  uomId: '',
+  uom: '',
+  quantity: 0,
+  requiredDate: '',
   requestType: 'Material',
 }
 
 const MaterialRequest = () => {
   const dispatch = useDispatch()
+  const { accessToken } = useSelector((store) => store.auth)
   const [formData, setFormData] = useState({ ...initialState })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const handleChange = (name, value) => {
     setFormData({
@@ -42,7 +59,7 @@ const MaterialRequest = () => {
   }
 
   const setPlannedDate = (value) => {
-    handleChange('plannedDate', value)
+    handleChange('requiredDate', value)
   }
 
   const handleAddToCart = () => {
@@ -51,7 +68,32 @@ const MaterialRequest = () => {
     setFormData({ ...initialState })
   }
 
-  const handlePlaceRequest = () => {}
+  const handlePlaceRequest = async () => {
+    const reqBody = { ...formData }
+    delete reqBody.requestType
+    console.log('Req Body : ', reqBody)
+
+    try {
+      setIsLoading(true)
+      const resp = await axios.post(
+        PlaceRequestUrl,
+        { ...reqBody },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json', // Optional, depends on your API
+          },
+        }
+      )
+      setIsLoading(false)
+      console.log('Resp : ', JSON.stringify(resp.data))
+      alert('You have successfully placed Request')
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+      alert('some error occured while submitting request , pls try again')
+    }
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -69,36 +111,46 @@ const MaterialRequest = () => {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <SearchInput
+        {/* <SearchInput
           label='Project'
           placeholder='Enter the project'
           value={formData.projectCode}
-          handleChange={(value) => handleChange('projectCode', value)}
+          handleChange={handleChange}
+        /> */}
+        <ProjectSearchInput
+          label='Project'
+          placeholder='Enter the project'
+          value={formData.projectDesc}
+          handleChange={setFormData}
         />
-        <SearchInput
-          label='Delivery Location'
-          placeholder='Enter the Warehouse'
-          value={formData.warehouse}
-          handleChange={(value) => handleChange('warehouse', value)}
-        />
-        <SearchInput
+        <WarehouseSearchInput
           label='Warehouse'
-          placeholder='Enter the Delivery location'
-          value={formData.deliveryLocation}
-          handleChange={(value) => handleChange('deliveryLocation', value)}
+          placeholder='Enter the Warehouse'
+          value={formData.warehouseDesc}
+          handleChange={setFormData}
+          projectId={formData.projectId}
         />
-        <SearchInput
+        <ProjectActivitySearchInput
           label='Project Activity'
           placeholder='Enter the project activity'
-          value={formData.projectActivity}
-          handleChange={(value) => handleChange('projectActivity', value)}
+          value={formData.activityDesc}
+          handleChange={setFormData}
+          projectId={formData.projectId}
         />
-        <SearchInput
+
+        <RequiredMaterialSearchInput
+          label='Required Material'
+          placeholder='Enter the Required Material'
+          value={formData.itemDesc}
+          handleChange={setFormData}
+          id='requiredMaterial'
+        />
+        {/* <SearchInput
           label='Required Material'
           placeholder='Enter the Required Material'
           value={formData.requiredMaterial}
           handleChange={(value) => handleChange('requiredMaterial', value)}
-        />
+        /> */}
 
         {/* <View style={styles.inputFormContainer}>
           <Text style={styles.inputFormHeader}>Required Material</Text>
@@ -120,9 +172,7 @@ const MaterialRequest = () => {
                 placeholder='Req qty'
                 style={styles.inputText}
                 value={formData.requiredQuantity}
-                onChangeText={(value) =>
-                  handleChange('requiredQuantity', value)
-                }
+                onChangeText={(value) => handleChange('quantity', value)}
               />
               {/* <IconButton icon='search' /> */}
             </View>
@@ -133,7 +183,7 @@ const MaterialRequest = () => {
               <TextInput
                 placeholder='planned date'
                 style={styles.inputText}
-                value={formData.plannedDate}
+                value={formData.requiredDate}
                 editable={false}
                 // onChangeText={(value) => handleChange('plannedDate', value)}
               />
@@ -157,6 +207,7 @@ const MaterialRequest = () => {
               icon='edit'
               color='green'
               labelColor='white'
+              loading={isLoading}
             />
           </View>
         </View>

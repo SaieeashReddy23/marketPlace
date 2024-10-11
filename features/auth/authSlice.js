@@ -66,6 +66,7 @@ const initialState = {
   refreshToken: null,
   accessToken: null,
   mobileNumber: '',
+  isDemoUser: false,
 }
 
 export const sendOtp = createAsyncThunk(
@@ -118,8 +119,10 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue, getState }) => {
     try {
-      const { mobileNumber, sessionToken } = getState().auth
-      const response = await axios(`${logoutUrl}/+91${mobileNumber}`)
+      const { mobileNumber, sessionToken, isDemoUser } = getState().auth
+      if (!isDemoUser) {
+        const response = await axios(`${logoutUrl}/+91${mobileNumber}`)
+      }
     } catch (error) {
       console.log(error)
       if (error?.response?.data?.errors.length > 0) {
@@ -176,6 +179,7 @@ const authSlice = createSlice({
       state.loading = false
       state.error = null
       state.accessToken = accessToken
+      state.isDemoUser = true
       AsyncStorage.setItem('accessToken', accessToken)
       AsyncStorage.setItem('userInfo', JSON.stringify(user))
       AsyncStorage.setItem('refreshToken', refreshToken)

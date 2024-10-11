@@ -4,6 +4,13 @@ export const sendOtpUrl = 'https://um.p360.build:8083/v1/um/user/login'
 export const verifyOtpUrl = 'https://um.p360.build:8083/v1/um/user/verify'
 export const logoutUrl = 'https://um.p360.build:8083/v1/um/user/logout'
 
+export const MDMBaseUrl = 'https://mdm.p360.build/v1/mdm'
+
+export const MDMBaseUrlV2 = 'https://mdm.p360.build/v2/mdm'
+
+export const PlaceRequestUrl =
+  'https://procure.p360.build:8083/v1/procure/material-indent/add'
+
 export const dummyLoginInfo = {
   userId: null,
   successMsg: null,

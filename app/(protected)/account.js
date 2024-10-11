@@ -18,7 +18,6 @@ const account = () => {
 
   const handleSignOut = () => {
     dispatch(logout())
-    // router.replace('/')
   }
 
   // useEffect(() => {
@@ -34,7 +33,7 @@ const account = () => {
         <View style={styles.projectInfoContainer}>
           <Text style={styles.projectInfoHeader}>Project Code </Text>
           <Text> : </Text>
-          <Text style={styles.projectInfoValue}>{description}</Text>
+          <Text style={styles.projectInfoValue}>{id}</Text>
         </View>
         <View style={styles.projectInfoContainer}>
           <Text style={styles.projectInfoHeader}>Project Name </Text>
