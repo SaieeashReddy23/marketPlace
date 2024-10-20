@@ -17,5 +17,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     minWidth: 110,
+    maxWidth: 150,
   },
 })

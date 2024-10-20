@@ -13,6 +13,11 @@ import OrderItem from '../../../components/orders/OrderItem'
 import { useState } from 'react'
 import OrderFilters from '../../../components/common/OrderFilters'
 import { Platform } from 'react-native'
+import { useFocusEffect } from 'expo-router'
+import Accepted from '../../../components/orders/Accepted'
+import Recieved from '../../../components/orders/Recieved'
+import Rejected from '../../../components/orders/Rejected'
+import Requested from '../../../components/orders/requested'
 const screenWidth = Dimensions.get('window').width // Get screen width
 
 // const items = Array.from({ length: 20 }, (_, i) => ({
@@ -186,6 +191,27 @@ const home = () => {
     setSelectedType(ordersType)
   }
 
+  let ordersComponent = null
+
+  switch (selectedType) {
+    case 'Requested':
+      console.log('Requested is selected')
+      ordersComponent = <Requested isNormalComponent='true' />
+      break
+    case 'Accepted':
+      console.log('Accepted is selected')
+      ordersComponent = <Accepted isNormalComponent='true' />
+      break
+    case 'Recieved':
+      console.log('Recieved is selected')
+      ordersComponent = <Recieved isNormalComponent='true' />
+      break
+    case 'Rejected':
+      console.log('Rejected is selected')
+      ordersComponent = <Rejected isNormalComponent='true' />
+      break
+  }
+
   return (
     <View style={styles.container}>
       {/* Dashboard indent history */}
@@ -268,17 +294,7 @@ const home = () => {
         <View style={styles.selectedTypeContainer}>
           <Text style={styles.selectedTypeText}>{selectedType}</Text>
         </View>
-        <View style={styles.filtersContainer}>
-          <OrderFilters items={items} setFilteredItems={setFilteredItems} />
-        </View>
-        <View style={styles.listContainer}>
-          <FlatList
-            scrollEnabled={true}
-            data={filteredItems}
-            renderItem={({ item }) => <OrderItem {...item} />}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
+        {ordersComponent}
       </View>
     </View>
   )
@@ -356,8 +372,8 @@ const styles = StyleSheet.create({
   },
 
   selectedTypeContainer: {
-    marginVertical: 10,
     paddingHorizontal: 10,
+    paddingTop: 5,
   },
   selectedTypeText: {
     fontSize: 16,

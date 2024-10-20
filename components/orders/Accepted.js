@@ -1,9 +1,16 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import OrderItem from './OrderItem'
 import { TextColor } from '../../utils/constants'
 import IconButton from '../common/IconButton'
 import OrderFilters from '../common/OrderFilters'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect } from 'expo-router'
 import { getAcceptedData } from '../../features/orders/accepted/acceptedSlice'
@@ -131,14 +138,64 @@ const items = [
   },
 ]
 
-const Accepted = () => {
+const Accepted = ({ isNormalComponent }) => {
   const dispatch = useDispatch()
-  const { data, loading, error } = useSelector((store) => store.accepted)
+  const { data, loading, error, hasMoreData } = useSelector(
+    (store) => store.accepted
+  )
   const [filteredItems, setFilteredItems] = useState([...items])
 
-  useFocusEffect(() => {
+  const fetchMoreData = () => {
+    if (loading || !hasMoreData) return
     dispatch(getAcceptedData())
-  })
+  }
+
+  // For tab usage, we use useFocusEffect
+  useFocusEffect(
+    useCallback(() => {
+      if (!isNormalComponent) {
+        console.log('calling accepted api in tab')
+        dispatch(getAcceptedData())
+      }
+
+      return () => {
+        // Cleanup if necessary
+      }
+    }, [isNormalComponent])
+  )
+
+  // For non-tab usage, using useEffect
+  useEffect(() => {
+    if (isNormalComponent) {
+      console.log('calling accepted api in index page')
+      dispatch(getAcceptedData())
+    }
+  }, [isNormalComponent])
+
+  if (error) {
+    return (
+      <View style={styles.errContainer}>
+        <Text>Some error occured while fetching data</Text>
+      </View>
+    )
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.loadContainer}>
+        <ActivityIndicator size='large' color='#8c8c8c' />
+      </View>
+    )
+  }
+
+  if (data?.length < 1) {
+    return (
+      <View style={styles.loadContainer}>
+        <Text>List is empty</Text>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       {/* Filters */}
@@ -151,6 +208,11 @@ const Accepted = () => {
           data={data}
           renderItem={({ item }) => <OrderItem {...item} />}
           keyExtractor={(item) => item.id}
+          onEndReached={fetchMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loading ? <ActivityIndicator size='large' /> : null
+          }
         />
       </View>
     </View>
@@ -159,6 +221,20 @@ const Accepted = () => {
 export default Accepted
 
 const styles = StyleSheet.create({
+  errContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  loadContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',

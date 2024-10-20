@@ -138,17 +138,17 @@ const initialState = {
   error: null,
 }
 
-export const getAcceptedData = createAsyncThunk(
-  'accepted/getAcceptedData',
+export const getRequestedData = createAsyncThunk(
+  'requested/getRequestedData',
   async (_, { rejectWithValue, getState }) => {
     try {
       const { accessToken } = getState().auth
-      const { pageNo, pageSize } = getState().accepted
+      const { pageNo, pageSize } = getState().requested
 
       const reqBody = {
         pageNo,
         pageSize,
-        status: 'ACCEPTED',
+        status: 'REQUESTED',
       }
 
       let resp = await axios.post(
@@ -162,8 +162,8 @@ export const getAcceptedData = createAsyncThunk(
         }
       )
 
-      let acceptedList = resp.data?.data?.content
-      return acceptedList
+      let recjectedList = resp.data?.data?.content
+      return recjectedList
     } catch (error) {
       if (error?.response?.data?.errors?.length > 0) {
         return rejectWithValue(error?.response?.data?.errors[0])
@@ -173,17 +173,17 @@ export const getAcceptedData = createAsyncThunk(
   }
 )
 
-const acceptedSlice = createSlice({
-  name: 'accepted',
+const requestedSlice = createSlice({
+  name: 'requested',
   initialState: { ...initialState },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getAcceptedData.pending, (state) => {
+      .addCase(getRequestedData.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(getAcceptedData.fulfilled, (state, action) => {
+      .addCase(getRequestedData.fulfilled, (state, action) => {
         let data = action.payload
         if (data.length > 0) {
           state.data = [...state.data, ...data]
@@ -194,11 +194,11 @@ const acceptedSlice = createSlice({
         state.loading = false
         state.error = null
       })
-      .addCase(getAcceptedData.rejected, (state, action) => {
+      .addCase(getRequestedData.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })
   },
 })
 
-export default acceptedSlice.reducer
+export default requestedSlice.reducer

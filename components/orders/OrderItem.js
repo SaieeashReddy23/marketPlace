@@ -10,10 +10,18 @@ import { useState } from 'react'
 import InfoComponent from './InfoComponent'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 
+const formatDate = (dateString) => {
+  if (dateString === '') {
+    return ''
+  }
+  const dateOnly = dateString.split(' ')[0]
+  return dateOnly
+}
+
 const OrderItem = (orderItem) => {
   const plannedDate = '01-01-2024'
 
-  const { id, orderName, orderPlacedDate } = orderItem
+  const { id, itemDesc, requiredDate, createdAt } = orderItem
   const [modalVisible, setModalVisible] = useState(false)
 
   const closeModal = () => {
@@ -30,12 +38,18 @@ const OrderItem = (orderItem) => {
     <View>
       <Pressable onPress={handleOpenOrderDetails} style={styles.container}>
         <View style={styles.itemTwoColumnContainer}>
-          <InfoComponent icon='shopping-cart' value={orderName} />
+          <InfoComponent icon='shopping-cart' value={itemDesc} />
           <InfoComponent icon='archive' value='BOQ' />
         </View>
         <View style={styles.itemTwoColumnContainer}>
-          <InfoComponent icon='calendar-month' value={orderPlacedDate} />
-          <InfoComponent icon='calendar-month' value={plannedDate} />
+          <InfoComponent
+            icon='calendar-month'
+            value={formatDate(requiredDate || '')}
+          />
+          <InfoComponent
+            icon='calendar-month'
+            value={formatDate(createdAt || '')}
+          />
         </View>
       </Pressable>
 

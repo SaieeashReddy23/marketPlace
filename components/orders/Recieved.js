@@ -1,7 +1,17 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import OrderItem from './OrderItem'
 import OrderFilters from '../common/OrderFilters'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAcceptedData } from '../../features/orders/accepted/acceptedSlice'
+import { getRecievedData } from '../../features/orders/recieved/recievedSlice'
+import { useFocusEffect } from 'expo-router'
 
 // const items = Array.from({ length: 20 }, (_, i) => ({
 //   id: i,
@@ -131,8 +141,62 @@ const items = [
   },
 ]
 
-const Recieved = () => {
+const Recieved = ({ isNormalComponent }) => {
+  const dispatch = useDispatch()
+  const { data, loading, error, hasMoreData } = useSelector(
+    (store) => store.recieved
+  )
   const [filteredItems, setFilteredItems] = useState([...items])
+
+  const fetchMoreData = () => {
+    if (loading || !hasMoreData) return
+    dispatch(getRecievedData())
+  }
+  // For tab usage, we use useFocusEffect
+  useFocusEffect(
+    useCallback(() => {
+      if (!isNormalComponent) {
+        console.log('calling recieved api in tab')
+        dispatch(getRecievedData())
+      }
+
+      return () => {
+        // Cleanup if necessary
+      }
+    }, [isNormalComponent])
+  )
+
+  // For non-tab usage, using useEffect
+  useEffect(() => {
+    if (isNormalComponent) {
+      console.log('calling recieved api in index page')
+      dispatch(getRecievedData())
+    }
+  }, [isNormalComponent])
+
+  if (error) {
+    return (
+      <View style={styles.errContainer}>
+        <Text>Some error occured while fetching data</Text>
+      </View>
+    )
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.loadContainer}>
+        <ActivityIndicator size='large' color='#8c8c8c' />
+      </View>
+    )
+  }
+
+  if (data?.length < 1) {
+    return (
+      <View style={styles.loadContainer}>
+        <Text>List is empty</Text>
+      </View>
+    )
+  }
   return (
     <View style={styles.container}>
       {/* Filters */}
@@ -142,9 +206,14 @@ const Recieved = () => {
       <View style={styles.listContainer}>
         <FlatList
           scrollEnabled={true}
-          data={filteredItems}
+          data={data}
           renderItem={({ item }) => <OrderItem {...item} />}
           keyExtractor={(item) => item.id}
+          onEndReached={fetchMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loading ? <ActivityIndicator size='large' /> : null
+          }
         />
       </View>
     </View>
@@ -153,6 +222,20 @@ const Recieved = () => {
 export default Recieved
 
 const styles = StyleSheet.create({
+  errContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  loadContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',

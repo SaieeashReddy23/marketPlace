@@ -138,17 +138,17 @@ const initialState = {
   error: null,
 }
 
-export const getAcceptedData = createAsyncThunk(
-  'accepted/getAcceptedData',
+export const getRecievedData = createAsyncThunk(
+  'recieved/getRecievedData',
   async (_, { rejectWithValue, getState }) => {
     try {
       const { accessToken } = getState().auth
-      const { pageNo, pageSize } = getState().accepted
+      const { pageNo, pageSize } = getState().recieved
 
       const reqBody = {
         pageNo,
         pageSize,
-        status: 'ACCEPTED',
+        status: 'RECIEVED',
       }
 
       let resp = await axios.post(
@@ -162,8 +162,8 @@ export const getAcceptedData = createAsyncThunk(
         }
       )
 
-      let acceptedList = resp.data?.data?.content
-      return acceptedList
+      let recievedList = resp.data?.data?.content
+      return recievedList
     } catch (error) {
       if (error?.response?.data?.errors?.length > 0) {
         return rejectWithValue(error?.response?.data?.errors[0])
@@ -173,17 +173,17 @@ export const getAcceptedData = createAsyncThunk(
   }
 )
 
-const acceptedSlice = createSlice({
-  name: 'accepted',
+const recievedSlice = createSlice({
+  name: 'recieved',
   initialState: { ...initialState },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getAcceptedData.pending, (state) => {
+      .addCase(getRecievedData.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(getAcceptedData.fulfilled, (state, action) => {
+      .addCase(getRecievedData.fulfilled, (state, action) => {
         let data = action.payload
         if (data.length > 0) {
           state.data = [...state.data, ...data]
@@ -194,11 +194,11 @@ const acceptedSlice = createSlice({
         state.loading = false
         state.error = null
       })
-      .addCase(getAcceptedData.rejected, (state, action) => {
+      .addCase(getRecievedData.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })
   },
 })
 
-export default acceptedSlice.reducer
+export default recievedSlice.reducer
