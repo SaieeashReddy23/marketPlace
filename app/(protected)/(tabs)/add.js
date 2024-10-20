@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
-import MaterialRequest from '../../components/newRequest/MaterialRequest'
-import MenRequest from '../../components/newRequest/MenRequest'
-import MachinaryRequest from '../../components/newRequest/MachinaryRequest'
+import MaterialRequest from '../../../components/newRequest/MaterialRequest'
+import MenRequest from '../../../components/newRequest/MenRequest'
+import MachinaryRequest from '../../../components/newRequest/MachinaryRequest'
 
-const add = () => {
+const Add = () => {
   const { requestType } = useSelector((store) => store.request)
 
   let requestTypeComponent = null
@@ -37,7 +37,7 @@ const add = () => {
     </View>
   )
 }
-export default add
+export default Add
 
 const styles = StyleSheet.create({
   container: {

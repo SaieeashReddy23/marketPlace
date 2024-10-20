@@ -4,10 +4,18 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import IconButton from './IconButton'
 
 const formatDate = (date) => {
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0') // January is 0!
-  const year = date.getFullYear()
-  return `${day}-${month}-${year}`
+  if (date === '') {
+    return ''
+  }
+
+  const day = date.getDate().toString().padStart(2, '0') // DD
+  const month = (date.getMonth() + 1).toString().padStart(2, '0') // MM
+  const year = date.getFullYear() // YYYY
+  const hours = date.getHours().toString().padStart(2, '0') // HH
+  const minutes = date.getMinutes().toString().padStart(2, '0') // mm
+  const seconds = date.getSeconds().toString().padStart(2, '0') // ss
+
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
 }
 
 // Fix datapicker for ios
@@ -32,11 +40,14 @@ const DatePickerComponent = ({ setValue }) => {
   }
 
   const handleOnchangeAndroid = ({ type }, selectedDate) => {
+    console.log('Type : ', type)
+    console.log('Selected Date : ', selectedDate)
     if (type === 'set') {
       const currentDate = selectedDate || date
+      const formattedDate = formatDate(currentDate)
       setShow(false)
       setDate(currentDate)
-      setValue(formatDate(currentDate))
+      setValue(formattedDate)
     } else {
       setShow(!show)
     }
@@ -63,7 +74,7 @@ const DatePickerComponent = ({ setValue }) => {
       {Platform.OS === 'ios' && show && (
         <Modal
           transparent={true}
-          animationType='slide'
+          animationType='fade'
           visible={show}
           onRequestClose={() => setShow(false)}
         >

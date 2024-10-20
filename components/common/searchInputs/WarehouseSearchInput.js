@@ -40,14 +40,12 @@ const WarehouseSearchInput = ({
       const resp = await axios.get(url)
 
       const warehousesList = resp.data?.data?.warehouses || []
-      const parsedWarehousesList = warehousesList.map(
-        ({ addressCode, address }) => {
-          return {
-            itemId: addressCode,
-            itemData: address,
-          }
+      const parsedWarehousesList = warehousesList.map(({ id, description }) => {
+        return {
+          itemId: id,
+          itemData: description,
         }
-      )
+      })
       setFilteredData(parsedWarehousesList)
       setIsLoading(false)
     } catch (error) {

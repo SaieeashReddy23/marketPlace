@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
-import CartItem from '../../components/cart/CartItem'
+import CartItem from '../../../components/cart/CartItem'
 import { useSelector } from 'react-redux'
 
 const cart = () => {

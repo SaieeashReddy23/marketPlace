@@ -18,11 +18,8 @@ const OTPLength = 6
 
 const LoginInfoContainer = () => {
   const dispatch = useDispatch()
-  // const [mobileNumber, setMobileNumber] = useState('')
   const [otp, setOtp] = useState(new Array(OTPLength).fill(''))
-  const [errorMessage, setErrorMessage] = useState('')
-  const [otpSent, setOtpSent] = useState(false)
-  const { isLoggedIn, error, isOtpSent, loading, mobileNumber } = useSelector(
+  const { error, isOtpSent, loading, mobileNumber } = useSelector(
     (state) => state.auth
   )
 
@@ -36,21 +33,13 @@ const LoginInfoContainer = () => {
 
   const handleVerifyOtp = () => {
     dispatch(verifyOtp(otp.join('')))
+    router.replace('/')
   }
 
   const handleDemoUser = () => {
     dispatch(setDemoUser())
+    router.replace('/')
   }
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      console.log('Is logged in')
-      setTimeout(() => {
-        // Navigate once the Root Layout is mounted
-        router.push('/home')
-      }, 0)
-    }
-  }, [isLoggedIn])
 
   return (
     <View style={styles.container}>

@@ -24,6 +24,13 @@ import ProjectActivitySearchInput from '../common/searchInputs/ProjectActivitySe
 import RequiredMaterialSearchInput from '../common/searchInputs/RequiredMaterialSearchInput'
 import axios from 'axios'
 
+const formatDate = (dateString) => {
+  if (dateString === '') {
+    return ''
+  }
+  const dateOnly = dateString.split(' ')[0]
+  return dateOnly
+}
 const initialState = {
   projectId: '',
   projectDesc: '',
@@ -69,9 +76,10 @@ const MaterialRequest = () => {
   }
 
   const handlePlaceRequest = async () => {
-    const reqBody = { ...formData }
-    delete reqBody.requestType
+    const reqBody = { ...formData, requestType: 'PURCHASE' }
+    console.log('url : ', PlaceRequestUrl)
     console.log('Req Body : ', reqBody)
+    console.log('access token : ', accessToken)
 
     try {
       setIsLoading(true)
@@ -87,6 +95,7 @@ const MaterialRequest = () => {
       )
       setIsLoading(false)
       console.log('Resp : ', JSON.stringify(resp.data))
+      // setFormData({ ...initialState })
       alert('You have successfully placed Request')
     } catch (error) {
       console.log(error)
@@ -104,6 +113,8 @@ const MaterialRequest = () => {
       }
     }, [])
   )
+
+  // console.log('form data : ', JSON.stringify(formData))
 
   return (
     <KeyboardAvoidingView
@@ -183,7 +194,7 @@ const MaterialRequest = () => {
               <TextInput
                 placeholder='planned date'
                 style={styles.inputText}
-                value={formData.requiredDate}
+                value={formatDate(formData.requiredDate)}
                 editable={false}
                 // onChangeText={(value) => handleChange('plannedDate', value)}
               />

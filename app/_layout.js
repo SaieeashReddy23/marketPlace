@@ -1,27 +1,40 @@
 import { Provider, useDispatch, useSelector } from 'react-redux'
 import store from '../store'
-import { ExpoRoot, Slot, useRouter } from 'expo-router'
+import { Slot, useRouter } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
 import { Stack } from 'expo-router/stack'
 import { useEffect } from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-const RootNavigator = () => {
-  const dispatch = useDispatch()
-  const router = useRouter()
-  const { userInfo, isLoggedIn, token, loading } = useSelector(
-    (store) => store.auth
-  )
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary,
+} from 'expo-router'
 
-  useEffect(() => {
-    if (!isLoggedIn && !loading) {
-      router.replace('/')
-    }
-  }, [loading, isLoggedIn])
+export const unstable_settings = {
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: 'login',
+}
+
+// SplashScreen.preventAutoHideAsync()
+
+const RootNavigator = () => {
+  // const dispatch = useDispatch()
+  // const router = useRouter()
+  // const { userInfo, isLoggedIn, token, loading } = useSelector(
+  //   (store) => store.auth
+  // )
+
+  // useEffect(() => {
+  //   if (!isLoggedIn && !loading) {
+  //     router.replace('/')
+  //   }
+  // }, [loading, isLoggedIn])
 
   return (
     <Provider store={store}>
-      <SafeAreaView style={styles.container}>
+      {/* <SafeAreaView style={styles.container}>
         <Stack
           screenOptions={{
             headerShown: false,
@@ -30,6 +43,9 @@ const RootNavigator = () => {
           <Stack.Screen name='index' />
           <Stack.Screen name='(protected)' />
         </Stack>
+      </SafeAreaView> */}
+      <SafeAreaView style={styles.container}>
+        <Slot />
       </SafeAreaView>
     </Provider>
   )

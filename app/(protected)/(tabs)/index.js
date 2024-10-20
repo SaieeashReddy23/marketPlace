@@ -9,9 +9,9 @@ import {
   ScrollView,
 } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
-import OrderItem from '../../components/orders/OrderItem'
+import OrderItem from '../../../components/orders/OrderItem'
 import { useState } from 'react'
-import OrderFilters from '../../components/common/OrderFilters'
+import OrderFilters from '../../../components/common/OrderFilters'
 import { Platform } from 'react-native'
 const screenWidth = Dimensions.get('window').width // Get screen width
 

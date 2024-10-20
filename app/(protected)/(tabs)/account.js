@@ -1,18 +1,13 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { TextColor } from '../../utils/constants'
-import Button from '../../components/common/Button'
-import { logout } from '../../features/auth/authSlice'
-import { router } from 'expo-router'
-import { useEffect } from 'react'
+import { TextColor } from '../../../utils/constants'
+import Button from '../../../components/common/Button'
+import { logout } from '../../../features/auth/authSlice'
 
-const account = () => {
+const Account = () => {
   const dispatch = useDispatch()
   const { userInfo, isLoggedIn, loading } =
     useSelector((store) => store.auth) || {}
-
-  const { userName, userMailId, userMobileNumber, assignedProjects } =
-    userInfo || {}
 
   const { fullName, email, phoneNumber, department } = userInfo || {}
 
@@ -83,7 +78,7 @@ const account = () => {
     </View>
   )
 }
-export default account
+export default Account
 
 const styles = StyleSheet.create({
   container: {

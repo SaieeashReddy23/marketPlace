@@ -152,13 +152,6 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: { ...initialState },
   reducers: {
-    // logout: (state) => {
-    //   state.userInfo = null
-    //   state.isLoggedIn = false
-    //   state.token = null
-    //   AsyncStorage.removeItem('authToken')
-    //   AsyncStorage.removeItem('userInfo')
-    // },
     loadAuthData: (state, action) => {
       const { userInfo, token } = action.payload
       state.userInfo = userInfo

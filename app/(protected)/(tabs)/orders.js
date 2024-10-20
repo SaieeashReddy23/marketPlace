@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+
 import Accepted from '../../../components/orders/Accepted'
 import Recieved from '../../../components/orders/Recieved'
 import Rejected from '../../../components/orders/Rejected'
@@ -7,7 +8,7 @@ import Requested from '../../../components/orders/requested'
 
 const Tab = createMaterialTopTabNavigator()
 
-const ordersLayout = () => {
+const Orders = () => {
   return (
     <View style={styles.container}>
       <Tab.Navigator
@@ -35,7 +36,7 @@ const ordersLayout = () => {
     </View>
   )
 }
-export default ordersLayout
+export default Orders
 
 const styles = StyleSheet.create({
   container: {

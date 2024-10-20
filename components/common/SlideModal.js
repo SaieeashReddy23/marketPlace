@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Transparent black background
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     height: '100%',
@@ -42,6 +42,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     padding: 20,
+    // backgroundColor: 'red',
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    // Shadow for Android
+    elevation: 8,
   },
   titleContainer: {
     height: '16%',

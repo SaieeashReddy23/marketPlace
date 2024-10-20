@@ -15,6 +15,6 @@ const ProtectedRoute = ({ children }) => {
     return <Redirect href='/' />
   }
 
-  return children
+  return isLoggedIn ? children : null
 }
 export default ProtectedRoute

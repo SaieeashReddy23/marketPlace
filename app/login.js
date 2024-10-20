@@ -5,7 +5,7 @@ import { TextColor } from '../utils/constants'
 import LoginInfoContainer from '../components/login/LoginInfoContainer'
 import { Link } from 'expo-router'
 const placeHolderImage = require('../assets/marketplaceLogin.png')
-const login = () => {
+const Login = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -34,7 +34,7 @@ const login = () => {
     </View>
   )
 }
-export default login
+export default Login
 
 const styles = StyleSheet.create({
   container: {

@@ -1,11 +1,11 @@
 import { useLocalSearchParams } from 'expo-router'
 import { StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
-import EditMachinaryRequest from '../../components/edit/EditMachinaryRequest'
-import EditMenRequest from '../../components/edit/EditMenRequest'
-import EditMaterialRequest from '../../components/edit/EditMaterialRequest'
+import EditMachinaryRequest from '../../../components/edit/EditMachinaryRequest'
+import EditMenRequest from '../../../components/edit/EditMenRequest'
+import EditMaterialRequest from '../../../components/edit/EditMaterialRequest'
 
-const edit = () => {
+const Edit = () => {
   const { id } = useLocalSearchParams()
   const { cartItems } = useSelector((store) => store.cart)
 
@@ -37,7 +37,7 @@ const edit = () => {
 
   return <View style={styles.container}>{requestTypeComponent}</View>
 }
-export default edit
+export default Edit
 
 const styles = StyleSheet.create({
   container: {

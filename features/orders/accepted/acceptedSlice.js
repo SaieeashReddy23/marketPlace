@@ -1,14 +1,7 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
-import OrderItem from './OrderItem'
-import { TextColor } from '../../utils/constants'
-import IconButton from '../common/IconButton'
-import OrderFilters from '../common/OrderFilters'
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useFocusEffect } from 'expo-router'
-import { getAcceptedData } from '../../features/orders/accepted/acceptedSlice'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import axios from 'axios'
 
-const items = [
+const dummyItems = [
   {
     id: 1,
     orderName: 'Office Supplies',
@@ -131,58 +124,51 @@ const items = [
   },
 ]
 
-const Accepted = () => {
-  const dispatch = useDispatch()
-  const { data, loading, error } = useSelector((store) => store.accepted)
-  const [filteredItems, setFilteredItems] = useState([...items])
-
-  useFocusEffect(() => {
-    dispatch(getAcceptedData())
-  })
-  return (
-    <View style={styles.container}>
-      {/* Filters */}
-      <View style={styles.filtersContainer}>
-        <OrderFilters items={items} setFilteredItems={setFilteredItems} />
-      </View>
-      <View style={styles.listContainer}>
-        <FlatList
-          scrollEnabled={true}
-          data={data}
-          renderItem={({ item }) => <OrderItem {...item} />}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-    </View>
-  )
+const initialState = {
+  data: [],
+  filters: {
+    search: '',
+    sortType: 'asc',
+  },
+  loading: false,
+  error: null,
 }
-export default Accepted
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-  },
+export const getAcceptedData = createAsyncThunk(
+  'accepted/getAcceptedData',
+  async (_, { rejectWithValue }) => {
+    try {
+      return dummyItems
+    } catch (error) {
+      console.log(error)
+      if (error?.response?.data?.errors.length > 0) {
+        return rejectWithValue(error?.response?.data?.errors[0])
+      }
+      return rejectWithValue(error.message)
+    }
+  }
+)
 
-  filtersContainer: {},
-
-  searchInputContainer: {
-    gap: 10,
-    borderWidth: 1,
-    borderColor: '#d9d9d9',
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 10,
-  },
-
-  inputText: {
-    color: TextColor,
-  },
-  listContainer: {
-    flex: 1,
+const acceptedSlice = createSlice({
+  name: 'accepted',
+  initialState: { ...initialState },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getAcceptedData.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(getAcceptedData.fulfilled, (state, action) => {
+        state.data = action.payload
+        state.error = null
+        state.error = null
+      })
+      .addCase(getAcceptedData.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
   },
 })
+
+export default acceptedSlice.reducer
